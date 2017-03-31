@@ -6,27 +6,48 @@ __author__ = 'Karen Gask'
 
 # Import packages
 from bs4 import BeautifulSoup
-from urllib.request import urlopen
+# Python 3
+# from urllib.request import urlopen
+# Python 2
+from urllib2 import urlopen
 import pandas as pd
 
 # Print name, colour, price and stock availability of dress
 # Input is a url
 def print_price_sizes(url):
+
     r = urlopen(url).read()
     soup = BeautifulSoup(r)
 
+    # print 'r: ', r
+    print soup
+    len(soup)
+
+    return soup
+
     # Name
     name_tag = soup.find_all("h1")
+    # Take the first element
+    # Return the text
+    # Capitalise first letters of each word
     name = name_tag[0].get_text().title()
 
     # Colour
-    colour_tag = soup.find_all("li", class_="selected")
+    # li -> any html with the attribute list
+    # class = the class of each list, selected doesn't exist any longer
+    # colour_tag = soup.find_all("li", class_="selected")
+    colour_tag = soup.find_all("li", class_="active")
+
+    print colour_tag
+
     colour = colour_tag[0].find("span").get_text()
     print(name, "in", colour)
 
     # Price
-    price_tag = soup.find_all("p", class_="product-price")
-    price = price_tag[0].get_text().strip()[1:]
+    # price_tag = soup.find_all("p", class_="product-price")
+    # price = price_tag[0].get_text().strip()[1:]
+    price_tag = soup.find_all("p", class_="prod-content_price")
+    price = price_tag[0].find('strong').get_text().strip()[1:]
     print("Price:",price)
 
     # Sizes in stock
@@ -46,7 +67,7 @@ def print_price_sizes(url):
     size_not_in_stock = [i.find("a").get_text() for i in not_in_stock]
     print("Sizes not in stock:",size_not_in_stock)
 
-print_price_sizes('http://www.coast-stores.com/p/orsay-floral-midi-dress/1744098')
+html = print_price_sizes('http://www.coast-stores.com/p/orsay-floral-midi-dress/1744098')
 
 # Obtain url links of all dresses on website
 r = urlopen('http://www.coast-stores.com/c/clothing/all-dresses').read()
@@ -115,4 +136,4 @@ for link in links:
     mydf = mydf.append(df_kaz, ignore_index=True)
 
 # Save dataframe to csv
-mydf.to_csv("C:/Users/ONS-BIG-DATA/Documents/Web scraping/Coast_dresses_Jan2017.csv", encoding='utf-8')
+mydf.to_csv("C:/Users/cmorris/PycharmProjects/dresses/Coast_dresses_Jan2017.csv", encoding='utf-8')
